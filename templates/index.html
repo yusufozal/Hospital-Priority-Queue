@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasta Takip Sistemi - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .stats-card {
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .treatment-time {
+            position: relative;
+            padding-right: 24px;
+        }
+
+        .treatment-time::after {
+            content: 'dk';
+            position: relative;
+            right: 8px;
+            color: #6B7280;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-8 px-4 mb-8">
+        <div class="container mx-auto max-w-6xl">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl md:text-4xl font-bold">Hasta Takip Sistemi</h1>
+                <div class="text-sm bg-white/20 px-4 py-2 rounded-full">
+                    <span id="current-time"></span>
+                </div>
+            </div>
+            <p class="mt-4 text-blue-100">Hasta kayıtlarını yönetin ve tedavi süreçlerini takip edin</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 max-w-6xl">
+        <!-- İstatistik Kartları -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stats-card bg-white p-6 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-gray-500 text-sm font-medium">Toplam Hasta</h3>
+                    <span class="bg-blue-100 text-blue-800 p-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </span>
+                </div>
+                <p class="mt-4 text-3xl font-bold text-gray-900">{{ hastalar|length }}</p>
+            </div>
+
+            <div class="stats-card bg-white p-6 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-gray-500 text-sm font-medium">Ortalama Tedavi Süresi</h3>
+                    <span class="bg-green-100 text-green-800 p-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </span>
+                </div>
+                <p class="mt-4 text-3xl font-bold text-gray-900">
+                    {% set total = namespace(value=0) %}
+                    {% for hasta in hastalar %}
+                        {% set total.value = total.value + hasta.tedavi_suresi %}
+                    {% endfor %}
+                    {{ "%.1f"|format(total.value / hastalar|length if hastalar|length > 0 else 0) }} dk
+                </p>
+            </div>
+
+            <div class="stats-card bg-white p-6 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-gray-500 text-sm font-medium">Acil Vakalar</h3>
+                    <span class="bg-red-100 text-red-800 p-2 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </span>
+                </div>
+                <p class="mt-4 text-3xl font-bold text-gray-900">
+                    {% set urgent = namespace(count=0) %}
+                    {% for hasta in hastalar %}
+                        {% if hasta.oncelik <= 2 %}
+                            {% set urgent.count = urgent.count + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    {{ urgent.count }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Hasta Tablosu -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">Hasta Listesi</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Öncelik</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tedavi Süresi</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for hasta in hastalar %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                #{{ hasta.id }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="priority-badge inline-flex {{ 'bg-red-100 text-red-800' if hasta.oncelik <= 2 else 'bg-yellow-100 text-yellow-800' if hasta.oncelik <= 5 else 'bg-green-100 text-green-800' }}">
+                                    {{ "Acil" if hasta.oncelik <= 2 else "Normal" if hasta.oncelik <= 5 else "Rutin" }}
+                                    ({{ hasta.oncelik }})
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 treatment-time">
+                                {{ hasta.tedavi_suresi }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Bekliyor
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Aksiyon Butonları -->
+        <div class="flex flex-wrap gap-4 justify-center mt-8">
+            <a href="/ekle" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 transform transition-all duration-200 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Yeni Hasta Ekle
+            </a>
+            <a href="/simulasyon" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg hover:from-green-700 hover:to-green-800 transform transition-all duration-200 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Tedavi Simülasyonu Başlat
+            </a>
+        </div>
+    </main>
+
+    <footer class="mt-16 py-8 text-center text-gray-600 border-t border-gray-200">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2024 Hasta Takip Sistemi. Tüm hakları saklıdır.</p>
+            <p class="mt-2 text-sm text-gray-500">Güvenli ve Hızlı Hasta Takip Çözümü</p>
+        </div>
+    </footer>
+
+    <script>
+        // Canlı saat gösterimi
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('tr-TR');
+            const dateStr = now.toLocaleDateString('tr-TR');
+            document.getElementById('current-time').textContent = `${dateStr} ${timeStr}`;
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
