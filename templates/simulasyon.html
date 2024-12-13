@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedavi Takip Sistemi - Hasta Yönetim Paneli</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-primary {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .gradient-success {
+            background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+        }
+        .gradient-warning {
+            background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="gradient-primary text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-hospital-user text-2xl"></i>
+                    <h1 class="text-xl font-bold">Tedavi Takip Sistemi</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="animate-pulse-slow">
+                        <i class="fas fa-circle text-green-400"></i>
+                        <span class="ml-2">Sistem Aktif</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- Özet Kartları -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card bg-white rounded-lg shadow-md p-6 slide-in" style="animation-delay: 0.1s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Toplam Hasta</p>
+                        <h3 class="text-2xl font-bold text-gray-800">{{ toplam_hasta }}</h3>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-white rounded-lg shadow-md p-6 slide-in" style="animation-delay: 0.2s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Tedavi Edilen</p>
+                        <h3 class="text-2xl font-bold text-green-600">{{ tedavi_edilen|length }}</h3>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card bg-white rounded-lg shadow-md p-6 slide-in" style="animation-delay: 0.3s">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Bekleyen</p>
+                        <h3 class="text-2xl font-bold text-red-600">{{ tedavi_edilemeyen|length }}</h3>
+                    </div>
+                    <div class="bg-red-100 rounded-full p-3">
+                        <i class="fas fa-clock text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tedavi Edilen Hastalar -->
+        <section class="mb-8 slide-in" style="animation-delay: 0.4s">
+            <div class="gradient-success rounded-t-lg py-4 px-6">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle text-white"></i>
+                    <h2 class="text-xl font-semibold text-white">Tedavi Edilen Hastalar</h2>
+                </div>
+            </div>
+            <div class="bg-white rounded-b-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Öncelik</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tedavi Süresi</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for hasta in tedavi_edilen %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                                            <span class="text-sm text-green-600 font-medium">{{ hasta.id }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        Seviye {{ hasta.oncelik }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ hasta.tedavi_suresi }} dakika</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        Tamamlandı
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tedavi Edilemeyen Hastalar -->
+        <section class="mb-8 slide-in" style="animation-delay: 0.5s">
+            <div class="gradient-warning rounded-t-lg py-4 px-6">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-exclamation-circle text-white"></i>
+                    <h2 class="text-xl font-semibold text-white">Tedavi Bekleyen Hastalar</h2>
+                </div>
+            </div>
+            <div class="bg-white rounded-b-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Öncelik</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beklenen Süre</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for hasta in tedavi_edilemeyen %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                                            <span class="text-sm text-red-600 font-medium">{{ hasta.id }}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Seviye {{ hasta.oncelik }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ hasta.tedavi_suresi }} dakika</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        Beklemede
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ana Sayfa Butonu -->
+        <div class="flex justify-center slide-in" style="animation-delay: 0.6s">
+            <a href="/" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-300 shadow-md hover:shadow-lg">
+                <i class="fas fa-home mr-2"></i>
+                Ana Sayfaya Dön
+            </a>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t mt-12 py-6">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <p class="text-gray-600">&copy; 2024 Hasta Takip Sistemi. Tüm hakları saklıdır.</p>
+                <div class="mt-4 md:mt-0">
+                    <span class="text-gray-500">
+                        <i class="fas fa-shield-alt text-blue-600 mr-1"></i>
+                        Güvenli Sistem
+                    </span>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

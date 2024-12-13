@@ -91,7 +91,6 @@ def hasta_ekle():
 
 @app.route('/simulasyon')
 def tedavi_simulasyonu():
-    # Her simülasyon başlangıcında listeleri sıfırla
     hastane.heap = []
     hastane.tedavi_edilenler = []
     hastane.tedavi_edilemeyenler = []
@@ -100,7 +99,8 @@ def tedavi_simulasyonu():
     hastane.tedavi_simulasyonu(420)
     tedavi_edilen = format_hasta_listesi(hastane.tedavi_edilenler)
     tedavi_edilemeyen = format_hasta_listesi(hastane.tedavi_edilemeyenler)
-    return render_template('simulasyon.html', tedavi_edilen=tedavi_edilen, tedavi_edilemeyen=tedavi_edilemeyen)
+    toplam_hasta=len(tedavi_edilen)+len(tedavi_edilemeyen)
+    return render_template('simulasyon.html', tedavi_edilen=tedavi_edilen, tedavi_edilemeyen=tedavi_edilemeyen,toplam_hasta=toplam_hasta)
 
 
 if __name__ == '__main__':
