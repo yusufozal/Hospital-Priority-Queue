@@ -5,7 +5,12 @@ Bu proje, bir hastane acil servisinin hastaları tedavi önceliklerine göre sı
 ## Kullanılan Teknolojiler
 - **Programlama Dili:** Python
 - **Veri Yapıları:** Min-Heap, Kuyruk (Queue)
-- **Kütüphaneler:** Flask 
+- **Kütüphaneler:** Flask
+
+> [!IMPORTANT]
+> Flask kütüphanesini eklemeyi unutmayın.
+
+
 ## Kurulum ve Çalıştırma
 1. Proje dosyalarını klonlayın:
    ```bash
@@ -69,13 +74,17 @@ Bu projede aşağıdaki adımlar izlenerek bir kod yapısı geliştirilecektir:
 4. **Raporlama**: Tedavi edilen ve edilemeyen hastaları raporlayan çıktılar yazılacak ve test edilecektir.
 
 ## Çıktılar
-- **Tedavi Edilen Hastalar**: Tedavi süreleri toplamı 7 saati geçmeden öncelik seviyesine göre tedavi edilen hastalar listesi.
-- **Tedavi Edilemeyen Hastalar**: Tedavi süreleri toplamı nedeniyle tedavi edilemeyen hastalar listesi.
+- [x] **Tedavi Edilen Hastalar**: Tedavi süreleri toplamı 7 saati geçmeden öncelik seviyesine göre tedavi edilen hastalar listesi.
+- [x] **Tedavi Edilemeyen Hastalar**: Tedavi süreleri toplamı nedeniyle tedavi edilemeyen hastalar listesi.
 
 
 
 ## Katkıda Bulunma
-Katkıda bulunmak için lütfen bir **Pull Request** oluşturun ya da proje sahibine ulaşın.
+**Katkıda bulunmak için lütfen bir **Pull Request** oluşturun ya da proje sahibine ulaşın.**
+
+> [!NOTE]
+> İşleri daha iyi veya daha kolay yapmak için faydalı tavsiyeler verebilirsiniz.
+
 
 ## Lisans
 Bu proje Kocaeli Üniversitesi Lisansı ile lisanslanmıştır.
